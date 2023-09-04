@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <!-- Include Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.7/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-500">
+    <div class="max-w-md mx-auto mt-8">
+        <div class="bg-white p-8 rounded shadow-md">
+            <h2 class="text-2xl font-semibold mb-4">Registration Form</h2>
+            <form action="/register" method="post">
+                <!-- Name Input -->
+                <div class="mb-4">
+                    <label for="name" class="block text-gray-700 font-medium mb-2">Name</label>
+                    <input type="text" id="name" name="name" placeholder="Your Name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                </div>
+                <!-- Email Input -->
+                <div class="mb-4">
+                    <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
+                    <input type="email" id="email" name="email" placeholder="you@example.com" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                </div>
+                <!-- Phone Input -->
+                <div class="mb-4">
+                    <label for="phone" class="block text-gray-700 font-medium mb-2">Phone</label>
+                    <input type="tel" id="phone" name="phone" placeholder="123-456-7890" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                </div>
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button type="submit" class="px-6 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600">Register</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="flex gap-5 justify-center text-center bg-gray-400 mt-3 mb-2 rounded p-2" id="users">
+        <div class="my-5" id="users-list">
+            <P class='text-3xl font-bold p-3 text-white'>All Users Information</p>
+        </div>
+        <div id="updateUser">        
+        </div>
+    </div>
+    <script>
+        fetch('/get-users')
+        .then(res => res.json())
+        .then(user => {
+            const userList = document.getElementById('users-list');
+            user.forEach(users => {
+                const items = document.createElement('div');
+                items.innerHTML = `
+                
+                name: ${users.name} <br/>  email: ${users.email} <br/> phone: ${users.phone} <br/>
+                <button class='bg-red-400 text-white p-2 rounded-md my-2 hover:bg-red-500' onclick = "deleteUser('${users._id}')" > Delete User </button> 
+                <button class='bg-red-400 text-white p-2 rounded-md my-2 hover:bg-red-500' onclick = "updateUser('${users._id}')" > Edit user </button> <br/> <hr/>
+                `;
+                userList.appendChild(items);
+            });
+        })
+
+    //delete user from database
+    const deleteUser = (id) => {
+        fetch(`/delete/${id}`, {
+            method: 'DELETE'
+        })
+        .then(res => res.json())
+        .then(data => console.log(data))
+    }
+
+    // edit user from database
+    const updateUser = (id) => {
+        fetch(`/updateUser/${id}`)
+        .then (res => res.json())
+        .then (result => {
+            console.log(result)
+            const updatedUser = document.getElementById('updateUser');
+            updatedUser.innerHTML = `
+            <div class="mt-5 p-3 border-4 border-white rounded-md">
+                <P class='text-2xl font-bold p-3 text-blue-600'>Edit this user Information</p>
+               Name: <input type='text' id='userName' value="${result.name}" /> <br/> <br/>
+               Email: <input type='email' id='userEmail' value="${result.email}" /> <br/><br/>
+               Phone: <input type='text' id='userPhone' value="${result.phone}" /> <br/>
+               <button class='bg-blue-400 text-white p-2 rounded-md my-2 hover:bg-blue-500' onclick = "updatedUser('${result._id}')" > Updated-user </button>
+            </div>  
+            `;
+        } )
+    }
+
+    //Updated user
+    const updatedUser =(id) =>{
+        const name = document.getElementById('userName').value;
+        const email = document.getElementById('userEmail').value;
+        const phone = document.getElementById('userPhone').value;
+        const user ={id, name, email, phone}
+        console.log(user)
+        fetch(`/updatedUser/${id}`, {
+            method:'PATCH',
+            headers: {'Content-Type' : 'application/json'},
+            body: JSON.stringify(user)
+        })
+        .then(res => res.json())
+        .then(result => console.log(result))
+    }
+    </script>
+</body>
+</html>
