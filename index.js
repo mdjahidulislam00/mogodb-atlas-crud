@@ -64,7 +64,7 @@ app.post('/register', async (req, res) => {
     const user = req.body;
     const result = await coll.insertOne(user);
     console.log(result);
-    res.send('New User Adding Successfully')
+    res.redirect('/')
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'An error occurred while registering the user' });
@@ -80,14 +80,13 @@ app.delete('/delete/:id', async (req, res) => {
   
   try {
     const result = await coll.deleteOne({ _id: new ObjectId(deleteItemId) });
-
     if (result.deletedCount === 0) {
       return res.status(404).json({ error: 'Item not found' });
-    }
 
-    return res.json({ message: 'Item deleted successfully' });
+    } else{
+      return res.send(deletedCount > 0)
+    }
   } catch (error) {
-    console.error(error);
     return res.status(500).json({ error: 'Server error' });
   }
 });
@@ -111,9 +110,8 @@ app.get('/updateUser/:id', async (req, res) => {
     return res.status(500).json({ error: 'Server error' });
   }
 });
-// Assuming you have already imported necessary packages and set up your MongoDB client
 
-// Update data in MongoDB
+
 // Update data in MongoDB
 app.patch('/updatedUser/:id', async (req, res) => {
   const updatedId = req.params.id;

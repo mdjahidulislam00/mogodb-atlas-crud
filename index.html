@@ -51,7 +51,7 @@
                 items.innerHTML = `
                 
                 name: ${users.name} <br/>  email: ${users.email} <br/> phone: ${users.phone} <br/>
-                <button class='bg-red-400 text-white p-2 rounded-md my-2 hover:bg-red-500' onclick = "deleteUser('${users._id}')" > Delete User </button> 
+                <button class='bg-red-400 text-white p-2 rounded-md my-2 hover:bg-red-500' onclick = "deleteUser(event,'${users._id}')" > Delete User </button> 
                 <button class='bg-red-400 text-white p-2 rounded-md my-2 hover:bg-red-500' onclick = "updateUser('${users._id}')" > Edit user </button> <br/> <hr/>
                 `;
                 userList.appendChild(items);
@@ -59,12 +59,14 @@
         })
 
     //delete user from database
-    const deleteUser = (id) => {
+    const deleteUser = (even, id) => {
         fetch(`/delete/${id}`, {
             method: 'DELETE'
         })
         .then(res => res.json())
-        .then(data => console.log(data))
+        .then(data => {
+            event.target.parentNode.style.display = 'none';
+        })
     }
 
     // edit user from database
